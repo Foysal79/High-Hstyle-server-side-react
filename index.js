@@ -29,6 +29,18 @@ async function run() {
     const database = client.db("highStyleDB");
     const userCollection = database.collection('items');
 
+    app.get('/items', async(req, res) => {
+        const items = await userCollection.find().toArray();
+        res.send(items);
+    })
+    app.get('/items/:name', async(req, res) => {
+        const id = req.params.name;
+        const query = {brandName : id }
+        const cursor = userCollection.find(query);
+        const result = await cursor.toArray();
+        res.send(result);
+    })
+      
     app.post('/items', async(req, res) => {
         const item = req.body;
         console.log('new item', item);
