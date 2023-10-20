@@ -66,12 +66,19 @@ app.post('/cart', async(req, res) => {
     const result = await cartCollection.insertOne(product);
     res.send(result);
 })
-/////////  card session data read
+/////////  cart session data read
 
 app.get('/cart', async(req, res) => {
     const cursor = cartCollection.find();
     const result = await cursor.toArray();
     res.send(result);
+})
+////// cart Delate
+app.delete('/cart/:id', async (req,res)=>{
+    const id = req.params.id;
+    const query = { _id: new ObjectId(id) };
+    const deleteResult = await cartCollection.deleteOne(query);
+    res.send(deleteResult);
 })
 
 ///////////////// single product
