@@ -56,6 +56,27 @@ async function run() {
 
     })
 
+    app.put('/item/:id', async(req, res) => {
+        const id = req.params.id;
+        const filter = {_id : new ObjectId(id)};
+        const options = {upsert: true}
+        const updatedItem = req.body;
+        const item = {
+            $set: {
+                name : updatedItem.name,
+                image : updatedItem.image,
+                brandName : updatedItem.brandName,
+                price : updatedItem.price,
+                description : updatedItem.description,
+                type : updatedItem.type,
+                rating: updatedItem.rating
+
+            }
+        }
+        const result = await userCollection.updateOne(filter, item, options);
+        res.send(result);
+    })
+
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
