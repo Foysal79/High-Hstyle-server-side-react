@@ -28,11 +28,14 @@ async function run() {
     await client.connect();
     const database = client.db("highStyleDB");
     const userCollection = database.collection('items');
-
+    const cartCollection = database.collection('cart');
+     /// all data form database
     app.get('/items', async(req, res) => {
         const items = await userCollection.find().toArray();
         res.send(items);
     })
+
+    ///// brand wise data 
     app.get('/items/:name', async(req, res) => {
         const id = req.params.name;
         const query = {brandName : id }
@@ -40,6 +43,7 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     })
+    //// product details
     app.get('/item/:id', async(req, res) => {
         const id = req.params.id;
         const query = {_id : new ObjectId(id)};
@@ -47,7 +51,7 @@ async function run() {
         const result = await cursor.toArray();
         res.send(result);
     })
-      
+      //// create data
     app.post('/items', async(req, res) => {
         const item = req.body;
         console.log('new item', item);
@@ -56,7 +60,29 @@ async function run() {
 
     })
 
-    app.put('/item/:id', async(req, res) => {
+//////////// cart session new product add 
+app.post('/cart', async(req, res) => {
+    const product = req.body;
+    const result = await cartCollection.insertOne(product);
+    res.send(result);
+})
+/////////  card session data read
+
+app.get('/cart', async(req, res) => {
+    const cursor = cartCollection.find();
+    const result = await cursor.toArray();
+    res.send(result);
+})
+
+///////////////// single product
+    app.get('/update/:id', async(req, res) => {
+        const id = req.params.id;
+        const query = { _id : new ObjectId(id) };
+        const item = await userCollection.findOne(query);
+        res.send(item);
+    })
+///////////// update
+    app.put('/update/:id', async(req, res) => {
         const id = req.params.id;
         const filter = {_id : new ObjectId(id)};
         const options = {upsert: true}
@@ -69,7 +95,7 @@ async function run() {
                 price : updatedItem.price,
                 description : updatedItem.description,
                 type : updatedItem.type,
-                rating: updatedItem.rating
+                rating : updatedItem.rating,
 
             }
         }
